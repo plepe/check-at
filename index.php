@@ -5,6 +5,23 @@ include "../../conf.php";
 include "../inc/hooks.php";
 include "../inc/sql.php";
 function debug($text) { }
+
+if(isset($_COOKIE['check-at-tags']))
+  $tags=json_decode($_COOKIE['check-at-tags'], true);
+else
+  $tags=array("population", "wikipedia:de");
+
+if($_REQUEST['add_tag']) {
+  $tags[]=$_REQUEST['add_tag'];
+}
+if($_REQUEST['del_tag']) {
+  $tmp=array_combine($tags, $tags);
+  unset($tmp[$_REQUEST['del_tag']]);
+  $tags=array_keys($tmp);
+}
+
+setcookie('check-at-tags', json_encode($tags));
+
 ?>
 <html>
 <head>
@@ -64,9 +81,9 @@ if(!$_REQUEST['what']) {
 }
 else {
   if($_REQUEST['what']=='node')
-    $fields=array("OSM ID", "name", "ref:at:gkz", "ref:at:okz", "population", "wikipedia:de");
+    $fields=array_merge(array("OSM ID", "name", "ref:at:gkz", "ref:at:okz"), $tags);
   elseif($_REQUEST['what']=='boundary')
-    $fields=array("OSM ID", "name", "ref:at:gkz", "ref:at:okz", "population", "wikipedia:de");
+    $fields=array_merge(array("OSM ID", "name", "ref:at:gkz", "ref:at:okz"), $tags);
   else
     $fields=array("name", "ref:at:gkz", "ref:at:okz", "status", "plz");
 
