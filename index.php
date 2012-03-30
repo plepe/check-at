@@ -6,21 +6,21 @@ include "../inc/hooks.php";
 include "../inc/sql.php";
 function debug($text) { }
 
-if(isset($_COOKIE['check-at-tags']))
-  $tags=json_decode($_COOKIE['check-at-tags'], true);
+if(isset($_COOKIE['check-at-conf']))
+  $conf=json_decode($_COOKIE['check-at-conf'], true);
 else
-  $tags=array("population", "wikipedia:de");
+  $conf=array("sort"=>0, "tags"=>array("population", "wikipedia:de"));
 
 if($_REQUEST['add_tag']) {
-  $tags[]=$_REQUEST['add_tag'];
+  $conf['tags'][]=$_REQUEST['add_tag'];
 }
 if($_REQUEST['del_tag']) {
-  $tmp=array_combine($tags, $tags);
+  $tmp=array_combine($tags, $conf['tags']);
   unset($tmp[$_REQUEST['del_tag']]);
-  $tags=array_keys($tmp);
+  $conf['tags']=array_keys($tmp);
 }
 
-setcookie('check-at-tags', json_encode($tags));
+setcookie('check-at-conf', json_encode($conf));
 
 ?>
 <html>
@@ -80,12 +80,17 @@ if(!$_REQUEST['what']) {
   print "</ul>\n";
 }
 else {
+  if(!$conf['tags'])
+    $conf['tags']=array();
+
   if($_REQUEST['what']=='node')
-    $fields=array_merge(array("OSM ID", "name", "ref:at:gkz", "ref:at:okz"), $tags);
+    $fields=array_merge(array("OSM ID", "name", "ref:at:gkz", "ref:at:okz"), $conf['tags']);
   elseif($_REQUEST['what']=='boundary')
-    $fields=array_merge(array("OSM ID", "name", "ref:at:gkz", "ref:at:okz"), $tags);
-  else
+    $fields=array_merge(array("OSM ID", "name", "ref:at:gkz", "ref:at:okz"), $conf['tags']);
+  else {
+    unset($conf['tags']);
     $fields=array("name", "ref:at:gkz", "ref:at:okz", "status", "plz");
+  }
 
   $link=".?what={$_REQUEST['what']}&value={$_REQUEST['value']}&del_tag=".urlencode($f);
   print "Tag hinzufügen: <form action='.' method='get'>";
@@ -97,7 +102,7 @@ else {
   print "<table>\n";
   foreach($fields as $f) {
     print "    <th>$f";
-    if(in_array($f, $tags)) {
+    if(in_array($f, $conf['tags'])) {
       $link=".?what={$_REQUEST['what']}&value={$_REQUEST['value']}&del_tag=".urlencode($f);
       print " <a href='$link'>&#x2715;</a>";
     }
