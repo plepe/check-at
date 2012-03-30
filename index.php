@@ -4,6 +4,7 @@ Header("content-type: text/html; charset=utf-8");
 include "../../conf.php";
 include "../inc/hooks.php";
 include "../inc/sql.php";
+include "functions.php";
 function debug($text) { }
 
 if(isset($_COOKIE['check-at-conf']))
@@ -19,6 +20,8 @@ if($_REQUEST['del_tag']) {
   unset($tmp[$_REQUEST['del_tag']]);
   $conf['tags']=array_keys($tmp);
 }
+if($_REQUEST['sort'])
+  $conf['sort']=$_REQUEST['sort'];
 
 setcookie('check-at-conf', json_encode($conf));
 
@@ -102,6 +105,13 @@ else {
   print "<table>\n";
   foreach($fields as $f) {
     print "    <th>$f";
+    if($conf['sort']==$f) {
+      print "<b>&darr;</b>";
+    }
+    else {
+      $link=".?what={$_REQUEST['what']}&value={$_REQUEST['value']}&sort=".urlencode($f);
+      print " <a href='$link'>&darr;</a>";
+    }
     if(in_array($f, $conf['tags'])) {
       $link=".?what={$_REQUEST['what']}&value={$_REQUEST['value']}&del_tag=".urlencode($f);
       print " <a href='$link'>&#x2715;</a>";
@@ -129,9 +139,18 @@ else {
       $ret1.="    <td>{$text}</td>\n";
     }
     $ret1.="  </tr>\n";
-    $ret[$elem['name']][]=$ret1;
+
+    $sort_value=$elem['name'];
+    if($conf['sort']=="OSM ID")
+      $sort_value=$elem['id'];
+    elseif($conf['sort']=="name")
+      $sort_value=$elem['name'];
+    elseif($conf['sort'])
+      $sort_value="{$elem[$conf['sort']]}-{$elem['name']}";
+
+    $ret[$sort_value][]=$ret1;
   }
-  ksort($ret);
+  $ret=keyNatSort($ret, true);
   foreach($ret as $r)
     print implode("\n", $r);
 
