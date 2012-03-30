@@ -1,4 +1,5 @@
 <?
+ini_set('memory_limit', '256M');
 Header("content-type: text/html; charset=utf-8");
 include "../../conf.php";
 include "../inc/hooks.php";
