@@ -10,7 +10,7 @@ function debug($text) { }
 if(isset($_COOKIE['check-at-conf']))
   $conf=json_decode($_COOKIE['check-at-conf'], true);
 else
-  $conf=array("sort"=>0, "tags"=>array("population", "wikipedia:de"));
+  $conf=array("sort"=>"name", "tags"=>array("population", "wikipedia:de"));
 
 if($_REQUEST['add_tag']) {
   $conf['tags'][]=$_REQUEST['add_tag'];
@@ -107,16 +107,17 @@ else {
   elseif($_REQUEST['what']=='boundary')
     $fields=array_merge(array("OSM ID", "name", "ref:at:gkz", "ref:at:okz"), $conf['tags']);
   else {
-    unset($conf['tags']);
     $fields=array("name", "ref:at:gkz", "ref:at:okz", "status", "plz");
   }
 
-  $link=".?what={$_REQUEST['what']}&value={$_REQUEST['value']}&del_tag=".urlencode($f);
-  print "Tag hinzufügen: <form action='.' method='get'>";
-  print "<input type='hidden' name='what' value='{$_REQUEST['what']}'>";
-  print "<input type='hidden' name='value' value='{$_REQUEST['value']}'>";
-  print "<input name='add_tag' value=''>";
-  print "</form>\n";
+  if($_REQUEST['what']!="sa") {
+    $link=".?what={$_REQUEST['what']}&value={$_REQUEST['value']}&del_tag=".urlencode($f);
+    print "Tag hinzufügen: <form action='.' method='get'>";
+    print "<input type='hidden' name='what' value='{$_REQUEST['what']}'>";
+    print "<input type='hidden' name='value' value='{$_REQUEST['value']}'>";
+    print "<input name='add_tag' value=''>";
+    print "</form>\n";
+  }
 
   print "<table>\n";
   foreach($fields as $f) {
