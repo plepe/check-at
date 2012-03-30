@@ -12,3 +12,6 @@ table td {
 a {
   text-decoration: none;
 }
+form {
+  display: inline;
+}

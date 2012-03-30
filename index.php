@@ -87,9 +87,21 @@ else {
   else
     $fields=array("name", "ref:at:gkz", "ref:at:okz", "status", "plz");
 
+  $link=".?what={$_REQUEST['what']}&value={$_REQUEST['value']}&del_tag=".urlencode($f);
+  print "Tag hinzufügen: <form action='.' method='get'>";
+  print "<input type='hidden' name='what' value='{$_REQUEST['what']}'>";
+  print "<input type='hidden' name='value' value='{$_REQUEST['value']}'>";
+  print "<input name='add_tag' value=''>";
+  print "</form>\n";
+
   print "<table>\n";
   foreach($fields as $f) {
-    print "    <th>$f</th>\n";
+    print "    <th>$f";
+    if(in_array($f, $tags)) {
+      $link=".?what={$_REQUEST['what']}&value={$_REQUEST['value']}&del_tag=".urlencode($f);
+      print " <a href='$link'>&#x2715;</a>";
+    }
+    print "</th>\n";
   }
   print "  </tr>\n";
 
