@@ -7,7 +7,16 @@ include "../inc/sql.php";
 include "functions.php";
 function debug($text) { }
 
-$object_types=array('N'=>'node', 'W'=>'way', 'R'=>'relation');
+function osm_link($id) {
+  $object_types=array('N'=>'node', 'W'=>'way', 'R'=>'relation');
+  return "http://www.openstreetmap.org/browse/".$object_types[substr($id, 0, 1)]."/".substr($id, 1);
+}
+
+function coalesce() {
+  foreach(func_get_args() as $arg)
+    if($arg)
+      return $arg;
+}
 
 if(isset($_COOKIE['check-at-conf']))
   $conf=json_decode($_COOKIE['check-at-conf'], true);
@@ -55,6 +64,24 @@ print "<h1>$title</h1>\n";
 print "Stand: ".$general['timestamp']."<br>\n";
 if(isset($_REQUEST['what']))
   print "<a href='.'>Zurück zur Übersicht</a><br>\n";
+
+if(($_REQUEST['what']=="sa")&&($_REQUEST['value']=="bezirk")) {
+  $check=array(array("6"), "ref:at:gkz");
+}
+if(($_REQUEST['what']=="sa")&&($_REQUEST['value']=="gemeinde")) {
+  $check=array(array("8"), "ref:at:gkz");
+}
+if(($_REQUEST['what']=="sa")&&($_REQUEST['value']=="ortschaft")) {
+  $check=array(array("8", "9", "10", "11"), "ref:at:okz");
+}
+
+if(isset($check)) {
+  $check_list=array();
+  foreach($list_boundaries as $ob) {
+    if(in_array($ob['admin_level'], $check[0]))
+      $check_list[$ob[$check[1]]][]=$ob;
+  }
+}
 
 $list=array(
   'node'=>array(
@@ -116,6 +143,10 @@ else {
     $fields=array("name", "ref:at:gkz", "ref:at:okz", "status", "plz");
   }
 
+  if(isset($check)) {
+    $fields[]="check";
+  }
+
   if($_REQUEST['what']!="sa") {
     $link=".?what={$_REQUEST['what']}&value={$_REQUEST['value']}&del_tag=".urlencode($f);
     print "Tag hinzufügen: <form action='.' method='get'>";
@@ -146,7 +177,7 @@ else {
   $l=$list[$_REQUEST['what']][$_REQUEST['value']];
   $ret=array();
   foreach($l as $elem) {
-    $link="http://www.openstreetmap.org/browse/".$object_types[substr($elem['id'], 0, 1)]."/".substr($elem['id'], 1);
+    $link=osm_link($elem['id']);
     $link_osb="http://www.openstreetbrowser.org/#{$elem['id']}";
     $ret1 ="  <tr>\n";
     foreach($fields as $f) {
@@ -155,6 +186,15 @@ else {
         case "OSM ID":
 	  $text="<a href='$link_osb'><img src='osb16.png'></a> <a href='$link'>{$elem['id']}</a>\n";
 	  break;
+        case "check":
+          $check_id=$elem[$check[1]];
+          if($check_id&&isset($check_list[$check_id])) {
+            $check_ob=$check_list[$check_id];
+            foreach($check_ob as $check_ob1)
+              $text="<a href='".osm_link($check_ob1['id'])."'>".coalesce($check_ob1['name'], "unnamed")."</a><br>";
+          }
+            //$text=print_r($check_list[$elem[$check[1]], 1);
+          break;
 	default:
 	  $text=$elem[$f];
       }
