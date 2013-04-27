@@ -36,6 +36,7 @@ setcookie('check-at-conf', json_encode($conf));
 <?
 $list_nodes=unserialize(file_get_contents("nodes.ser"));
 $list_boundaries=unserialize(file_get_contents("boundaries.ser"));
+$general=unserialize(file_get_contents("general.ser"));
 $list_sa=unserialize(file_get_contents("sa.ser"));
 
 if(!isset($_REQUEST['what'])) {
@@ -51,7 +52,7 @@ elseif($_REQUEST['what']=="sa") {
   $title="Statistik Austria, {$_REQUEST['value']}";
 }
 print "<h1>$title</h1>\n";
-print "Stand: 1. April 2012";
+print "Stand: ".$general['timestamp']."<br>\n";
 if(isset($_REQUEST['what']))
   print "<a href='.'>Zurück zur Übersicht</a><br>\n";
 
