@@ -145,6 +145,7 @@ else {
 
   if(isset($check)) {
     $fields[]="check";
+    $fields_desc['check']="Check OSM (via {$check[1]})";
   }
 
   if($_REQUEST['what']!="sa") {
@@ -158,7 +159,11 @@ else {
 
   print "<table>\n";
   foreach($fields as $f) {
-    print "    <th>$f";
+    print "    <th>";
+    if(isset($fields_desc[$f]))
+      print $fields_desc[$f];
+    else
+      print $f;
     if($conf['sort']==$f) {
       print "<b>&darr;</b>";
     }
