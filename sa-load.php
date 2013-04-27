@@ -5,6 +5,7 @@ include "../../conf.php";
 include "../inc/hooks.php";
 include "../inc/sql.php";
 function debug($text) { }
+setlocale(LC_CTYPE, "POSIX");
 
 function read_file($file, $type) {
   $ret=array();
@@ -30,6 +31,7 @@ function read_file($file, $type) {
       $gkz=$x[2];
       $status=$stati[$x[3]];
       $name=utf8_encode($x[1]);
+//      print_r($x);
       $plz=$x[4];
       if($x[5])
 	$plz.=" und {$x[5]}";

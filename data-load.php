@@ -12,7 +12,7 @@ $res=sql_query("select osm_id, osm_tags from osm_point join (select load_geo('re
 while($elem=pg_fetch_assoc($res)) {
   $x=parse_hstore($elem['osm_tags']);
   $x['id']=$elem['osm_id'];
-  $stats['node'][$elem['place']]++;
+  $stats['node'][$x['place']]++;
 
   $list_nodes[]=$x;
 }
@@ -23,7 +23,9 @@ $res=sql_query("select osm_id, osm_tags from osm_polygon_extract join (select lo
 while($elem=pg_fetch_assoc($res)) {
   $x=parse_hstore($elem['osm_tags']);
   $x['id']=$elem['osm_id'];
-  $stats['boundary'][$elem['admin_level']]++;
+  if(!isset($x['admin_level']))
+    $x['admin_level']="";
+  $stats['boundary'][$x['admin_level']]++;
 
   $list_boundaries[]=$x;
 }

@@ -49,6 +49,7 @@ elseif($_REQUEST['what']=="sa") {
   $title="Statistik Austria, {$_REQUEST['value']}";
 }
 print "<h1>$title</h1>\n";
+print "Stand: 1. April 2012";
 if(isset($_REQUEST['what']))
   print "<a href='.'>Zurück zur Übersicht</a><br>\n";
 
@@ -69,7 +70,9 @@ $list=array(
 foreach($list_nodes as $elem) {
   $list['node'][$elem['place']][]=$elem;
 }
-foreach($list_boundaries as $elem) {
+foreach($list_boundaries as $i=>$elem) {
+  if(!isset($elem['admin_level']))
+    $elem['admin_level']="";
   $list['boundary'][$elem['admin_level']][]=$elem;
 }
 $list['sa']=$list_sa;
