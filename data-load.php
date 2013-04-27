@@ -1,17 +1,17 @@
 #!/usr/bin/php
 <?
-include "../../conf.php";
-include "../inc/hooks.php";
-include "../inc/sql.php";
+include "../conf.php";
+include "../modules/base/modules/hooks/hooks.php";
+include "../modules/base/modules/pg_sql/sql.php";
 function debug($text) { }
 
 $list_nodes=array();
 $date=Date("Ymd");
 print "Nodes ...\n";
-$res=sql_query("select osm_id, osm_tags from osm_point join (select load_geo('rel_16239') as boundary offset 0) x on x.boundary && osm_way and CollectionIntersects(x.boundary, osm_way) and osm_tags ? 'place'");
+$res=sql_query("select id, tags from osm_point(load_geo('R16239'), $\$tags ? 'place'$$) where CollectionIntersects((select load_geo('R16239') offset 0), way)");
 while($elem=pg_fetch_assoc($res)) {
-  $x=parse_hstore($elem['osm_tags']);
-  $x['id']=$elem['osm_id'];
+  $x=parse_hstore($elem['tags']);
+  $x['id']=$elem['id'];
   $stats['node'][$x['place']]++;
 
   $list_nodes[]=$x;
@@ -19,10 +19,10 @@ while($elem=pg_fetch_assoc($res)) {
 
 print "Boundaries ...\n";
 $list_boundaries=array();
-$res=sql_query("select osm_id, osm_tags from osm_polygon_extract join (select load_geo('rel_16239') as boundary offset 0) x on x.boundary && osm_way and CollectionWithin(osm_way, x.boundary) and osm_tags @> 'boundary=>administrative'");
+$res=sql_query("select id, tags from osm_polygon(load_geo('R16239'), $\$tags @> 'boundary=>administrative'$$) where CollectionIntersects((select load_geo('R16239') offset 0), way)");
 while($elem=pg_fetch_assoc($res)) {
-  $x=parse_hstore($elem['osm_tags']);
-  $x['id']=$elem['osm_id'];
+  $x=parse_hstore($elem['tags']);
+  $x['id']=$elem['id'];
   if(!isset($x['admin_level']))
     $x['admin_level']="";
   $stats['boundary'][$x['admin_level']]++;

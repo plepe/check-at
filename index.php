@@ -7,6 +7,8 @@ include "../inc/sql.php";
 include "functions.php";
 function debug($text) { }
 
+$object_types=array('N'=>'node', 'W'=>'way', 'R'=>'relation');
+
 if(isset($_COOKIE['check-at-conf']))
   $conf=json_decode($_COOKIE['check-at-conf'], true);
 else
@@ -86,7 +88,7 @@ if(!$_REQUEST['what']) {
   print "</ul>\n";
 
   print "<h2>Boundaries</h2>";
-  print "<i>Achtung! Es kann sein, dass das Objekte fehlen, weil sie vom OpenStreetBrowser falsch interpretiert wurden. Im Zweifelsfall bitte nachfragen.</i>\n";
+  print "<i>Achtung! Es kann sein, dass Objekte fehlen, weil sie vom OpenStreetBrowser falsch interpretiert wurden. Im Zweifelsfall bitte nachfragen.</i>\n";
   print "<ul>\n";
   ksort($list['boundary']);
   foreach($list['boundary'] as $lev=>$l) {
@@ -143,7 +145,7 @@ else {
   $l=$list[$_REQUEST['what']][$_REQUEST['value']];
   $ret=array();
   foreach($l as $elem) {
-    $link="http://www.openstreetmap.org/browse/".strtr($elem['id'], array("_"=>"/", "rel"=>"relation"));
+    $link="http://www.openstreetmap.org/browse/".$object_types[substr($elem['id'], 0, 1)]."/".substr($elem['id'], 1);
     $link_osb="http://www.openstreetbrowser.org/#{$elem['id']}";
     $ret1 ="  <tr>\n";
     foreach($fields as $f) {

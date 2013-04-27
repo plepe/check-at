@@ -38,9 +38,9 @@ function read_file($file, $type) {
     }
     elseif($type=="ortschaft") {
       $gkz=$x[0];
-      $okz=$x[3];
-      $name=utf8_encode($x[4]);
-      $plz=$x[5];
+      $okz=$x[2];
+      $name=utf8_encode($x[3]);
+      $plz=$x[4];
     }
 
     $ret1=array(
